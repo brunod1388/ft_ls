@@ -33,6 +33,9 @@ void add_option(t_ls_ctrl *ctrl, char *option_arg) {
 			case 't':
 				ctrl->options |= OPTION_t;
 				break;
+			case 'G':
+				ctrl->options |= OPTION_G;
+				break;
 			default:
 				clear_args(ctrl);
 				ft_fprintf(error_msg, "illegal option -- %c", option);
@@ -43,7 +46,7 @@ void add_option(t_ls_ctrl *ctrl, char *option_arg) {
 }
 
 t_ls_ctrl parse_args(int argc, char *argv[]) {
-	t_ls_ctrl ctrl = {.options = 0, .paths = NULL, .current_dir = NULL, .dirents = NULL};
+	t_ls_ctrl ctrl = {.options = 0, .paths = NULL};
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-')
@@ -61,10 +64,6 @@ t_ls_ctrl parse_args(int argc, char *argv[]) {
 void clear_args(t_ls_ctrl *ctrl) {
 	if (ctrl->paths)
 		ft_lstclear(&ctrl->paths, NULL);
-	if (ctrl->dirents)
-		ft_lstclear(&ctrl->dirents, NULL);
-	if (ctrl->current_dir)
-		closedir(ctrl->current_dir);
 }
 
 void print_args(const t_ls_ctrl ctrl) {

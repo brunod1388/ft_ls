@@ -1,34 +1,64 @@
 #include "ft_ls.h"
 
-int dirent_cmp(void *a, void *b) {
-	return ft_strcmp_ci(((struct dirent *)a)->d_name, ((struct dirent *)b)->d_name);
+t_list *process_dir(DIR *dir, char *path) {
+	struct dirent *entry;
+	t_list *dir_data = NULL;
+
+	while ((entry = readdir(dir))) {
+		struct s_dir_data *data = new_dir_data(entry, path);
+		if (!data) {
+			ft_lstclear(&dir_data,(void (*)(void *)) clear_dir_data);
+			ft_error("malloc in process_dir", 0);
+			return NULL;
+		}
+		ft_lstadd_back(&dir_data, ft_lstnew(data));
+	}
+
+	return dir_data;
 }
 
-int display_dir(int fd, char *path, t_ls_ctrl *ctrl) {
+void apply_sort_options(t_list *dir_data, t_options options) {
+	if (options & OPTION_t && !(options & OPTION_r)) {
+		ft_lstsort(&dir_data, (int (*)(void *, void *)) dir_data_time_cmp);
+	}
+	else if (options & OPTION_t && options & OPTION_r) {
+		ft_lstsort(&dir_data, (int (*)(void *, void *)) dir_data_time_cmp_reverse);
+	}
+	else if (options & OPTION_r) {
+		ft_lstsort(&dir_data, (int (*)(void *, void *)) dir_data_name_cmp_reverse);
+	}
+	else {
+		ft_lstsort(&dir_data, (int (*)(void *, void *)) dir_data_name_cmp);
+	}
+}
+
+int process_path(int fd, char *path, t_ls_ctrl *ctrl) {
+	DIR *dir;
+	t_list *dir_data;
+
 	if (path == NULL) {
 		ft_error("NULL path", 0);
 		return 1;
 	}
-	ctrl->current_dir = opendir(path);
-	if (!ctrl->current_dir) {
+	dir = opendir(path);
+	if (!dir) {
 		ft_error(path, 0);
 		return 1;
 	}
-	struct dirent *entry;
-
-	while ((entry = readdir(ctrl->current_dir))) {
-		ft_lstadd_back(&ctrl->dirents, ft_lstnew(entry));
+	dir_data = process_dir(dir, path);
+	closedir(dir);
+	if (!dir_data) {
+		return 1;
 	}
-	ft_lstsort(&ctrl->dirents, dirent_cmp);
+
+	apply_sort_options(dir_data, ctrl->options);
 
 	do {
-		entry = ft_lstpop_front(&ctrl->dirents);
-		// ft_printf_fd(fd, "%s type: %s\n", entry->d_name, get_dirent_type_string(entry->d_type));
-		print_dir(fd, path, entry, ctrl->options);
-	} while (ctrl->dirents);
+		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&dir_data);
+		print_dir(fd, current_dir, ctrl->options);
+		free(current_dir);
+	} while (dir_data);
 
-	closedir(ctrl->current_dir);
-	ctrl->current_dir = NULL;
 	return 0;
 }
 
@@ -46,7 +76,7 @@ int ft_ls_fd(int fd, int argc, char *argv[]) {
 			ft_printf_fd(fd, "%s:\n", (char *)current->content);
 		}
 
-		int ret = display_dir(fd, (char *)current->content, &ctrl);
+		int ret = process_path(fd, (char *)current->content, &ctrl);
 
 		if ( ret != 0) {
 			ft_lstclear(&ctrl.paths, NULL);
