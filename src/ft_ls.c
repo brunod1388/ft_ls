@@ -1,10 +1,12 @@
 #include "ft_ls.h"
 
-t_list *process_dir(DIR *dir, char *path) {
+t_list *process_dir(DIR *dir, char *path, t_options options) {
 	struct dirent *entry;
 	t_list *dir_data = NULL;
 
 	while ((entry = readdir(dir))) {
+		if (entry->d_name[0] == '.' && !(options & OPTION_a))
+			continue;
 		struct s_dir_data *data = new_dir_data(entry, path);
 		if (!data) {
 			ft_lstclear(&dir_data,(void (*)(void *)) clear_dir_data);
@@ -45,7 +47,7 @@ int process_path(int fd, char *path, t_ls_ctrl *ctrl) {
 		ft_error(path, 0);
 		return 1;
 	}
-	dir_data = process_dir(dir, path);
+	dir_data = process_dir(dir, path, ctrl->options);
 	closedir(dir);
 	if (!dir_data) {
 		return 1;
@@ -53,11 +55,7 @@ int process_path(int fd, char *path, t_ls_ctrl *ctrl) {
 
 	apply_sort_options(dir_data, ctrl->options);
 
-	do {
-		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&dir_data);
-		print_dir(fd, current_dir, ctrl->options);
-		clear_dir_data(current_dir);
-	} while (dir_data);
+	print_dir(fd, dir_data, ctrl->options);
 
 	return 0;
 }

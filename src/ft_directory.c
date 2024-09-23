@@ -22,6 +22,8 @@ struct s_dir_data *new_dir_data(struct dirent *entry, char *path) {
 	data->size = statbuf.st_size;
 	data->time = statbuf.st_mtime;
 	data->nlink = statbuf.st_nlink;
+	data->block_size = statbuf.st_blocks;
+	data->d_type = entry->d_type;
 	data->owner = ft_strdup(getpwuid(statbuf.st_uid)->pw_name);
 	data->group = ft_strdup(getgrgid(statbuf.st_gid)->gr_name);
 	if (!data->owner || !data->group) {

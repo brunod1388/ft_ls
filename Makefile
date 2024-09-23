@@ -13,7 +13,7 @@ SRC_DIR = src
 OBJ_DIR = obj
 BIN_DIR = bin
 
-SRCS 	=	main.c ft_args.c ft_ls.c ft_print.c ft_test.c ft_format.c ft_utils.c ft_comparators.c ft_directory.c
+SRCS 	=	main.c ft_args.c ft_ls.c ft_print.c ft_format.c ft_utils.c ft_comparators.c ft_directory.c
 
 OBJS	=	$(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
@@ -59,5 +59,8 @@ test:
 	exa -la testFolder libft
 
 retest: re test
+
+leaks:
+	leaks -atExit -- ./ft_ls
 
 PHONY: re all clean fclean

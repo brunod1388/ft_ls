@@ -75,10 +75,13 @@ void format_perms(char *dest, char *perms) {
 	ft_strcat(dest, COLOR_RESET);
 }
 
-void format_name(char *dest, char *name) {
-	if (name[0] == '.') {
-		ft_strcat(dest, COLOR_GREY);
-	}
-	ft_strcat(dest, name);
-	ft_strcat(dest, COLOR_RESET);
+void format_name(char *dest, t_dir_data *dir_data, t_options options) {
+	if (!(options & OPTION_G))
+		ft_strcpy(dest, dir_data->name);
+	else if (dir_data->d_type == DT_DIR)
+		ft_fprintf(dest, "%s%s%s", COLOR_BLUE, dir_data->name, COLOR_RESET);
+	else if (dir_data->d_type == DT_LNK)
+		ft_fprintf(dest, "%s%s%s", COLOR_YELLOW, dir_data->name, COLOR_RESET);
+	else
+		ft_strcpy(dest, dir_data->name);
 }

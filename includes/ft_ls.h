@@ -47,13 +47,15 @@ typedef struct s_ls_ctrl {
 } t_ls_ctrl;
 
 typedef struct s_dir_data {
-	char		*name;
-	char		perms[128];
-	char		*owner;
-	char		*group;
-	int64_t		size;
-	time_t		time;
-	int 		nlink;
+	char			*name;
+	char			perms[128];
+	char			*owner;
+	char			*group;
+	int64_t			size;
+	time_t			time;
+	int 			nlink;
+	int 			block_size;
+	unsigned char	d_type;
 } t_dir_data;
 
 
@@ -66,12 +68,13 @@ t_dir_data	*new_dir_data(struct dirent *entry, char *path);
 void		clear_dir_data(t_dir_data *data);
 
 // ft_print.c
-void print_dir(int fd, t_dir_data *dir_data, t_options options);
+void print_dir(int fd, t_list *dir_data, t_options options);
 
 // ft_format.c
 void format_size(char *dest, int size);
 void format_time(char *dest, char *time_str);
 void format_perms(char *dest, char *perms);
+void format_name(char *dest, t_dir_data *dir_data, t_options options);
 
 // ft_args.c
 t_ls_ctrl	parse_args(int argc, char *argv[]);
@@ -85,10 +88,8 @@ int	dir_data_time_cmp(const void *a, const void *b);
 int	dir_data_time_cmp_reverse(const void *a, const void *b);
 
 // ft_utils.c
-char	get_dir_type(struct stat statbuf);
-void	set_permissions(char *perms, struct stat statbuf);
-
-// ft_test.c
+char		get_dir_type(struct stat statbuf);
+void		set_permissions(char *perms, struct stat statbuf);
 const char* get_dirent_type_string(unsigned char d_type);
 void		ft_error(const char *msg, const int exiting);
 
