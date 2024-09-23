@@ -56,7 +56,7 @@ int process_path(int fd, char *path, t_ls_ctrl *ctrl) {
 	do {
 		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&dir_data);
 		print_dir(fd, current_dir, ctrl->options);
-		free(current_dir);
+		clear_dir_data(current_dir);
 	} while (dir_data);
 
 	return 0;
@@ -86,6 +86,7 @@ int ft_ls_fd(int fd, int argc, char *argv[]) {
 		if (current)
 			ft_putchar_fd('\n', fd);
 	}
+	clear_args(&ctrl);
 	return 0;
 }
 
