@@ -17,22 +17,28 @@ void print_list(char dest[MAX_LINE_LEN], t_dir_data *dir_data, t_options options
 		format_perms(formatted_permissions, dir_data->perms);
 	}
 
-	ft_fprintf(
-		dest,
-		"%s %s%s %s%2d %s%s %s %s%s %s%s\n",
-		colored ? formatted_permissions : dir_data->perms,
-		colored ? COLOR_GREEN : "",
-		formatted_size,
-		colored ? COLOR_BLUE : "",
-		dir_data->nlink,
-		colored ? COLOR_YELLOW : "",
-		dir_data->owner,
-		dir_data->group,
-		colored ? COLOR_BLUE : "",
-		formatted_time,
-		colored ? COLOR_RESET : "",
-		formatted_name
-	);
+	int offset = 0;
+
+#if EXA
+	offset += ft_fprintf(dest + offset, "%s", colored ? formatted_permissions : dir_data->perms);
+	if (EXA == 1 && dir_data->d_type != DT_DIR)
+		offset += ft_fprintf(dest + offset, "%s%6s", colored ? COLOR_BLUE : "", formatted_size);
+	else
+		offset += ft_fprintf(dest + offset, "%s     -", COLOR_GREY);
+	offset += ft_fprintf(dest + offset, " %s%s", colored ? COLOR_YELLOW : "", dir_data->owner);
+	offset += ft_fprintf(dest + offset, " %s", dir_data->group);
+	offset += ft_fprintf(dest + offset, " %s%s", colored ? COLOR_BLUE : "", formatted_time);
+	offset += ft_fprintf(dest + offset, " %s%s\n", colored ? COLOR_RESET : "", formatted_name);
+#else
+	offset += ft_fprintf(dest + offset, "%s", colored ? formatted_permissions : dir_data->perms);
+	offset += ft_fprintf(dest + offset, "%s%4d ", colored ? COLOR_BLUE : "", dir_data->nlink);
+	offset += ft_fprintf(dest + offset, "%s%s ", colored ? COLOR_YELLOW : "", dir_data->owner);
+	offset += ft_fprintf(dest + offset, " %s ", dir_data->group);
+	offset += ft_fprintf(dest + offset, "%s%6s ", colored ? COLOR_BLUE : "", formatted_size);
+	offset += ft_fprintf(dest + offset, "%s%s ", colored ? COLOR_BLUE : "", formatted_time);
+	offset += ft_fprintf(dest + offset, "%s%s\n", colored ? COLOR_RESET : "", formatted_name);
+#endif
+
 #if DEBUG
 	dest[ft_strlen(dest) - 1] = '\t';
 	ft_strcat(dest, get_dirent_type_string(dir_data->d_type));
@@ -57,11 +63,23 @@ void print_entry(int fd, t_dir_data *entry, t_options options) {
 	ft_putstr_fd(dest, fd);
 }
 
+void print_headers(int fd) {
+	ft_printf_fd(fd, "%c[4mPermissions%c[0m",27,27);
+	ft_printf_fd(fd, " %c[4mSize%c[0m",27,27);
+	ft_printf_fd(fd, " %c[4mUser%c[0m",27,27);
+	ft_printf_fd(fd, "      %c[4mGroup%c[0m",27,27);
+	ft_printf_fd(fd, " %c[4mDate Modified%c[0m",27,27);
+	ft_printf_fd(fd, "     %c[4mName\n%c[0m",27,27);
+}
+
 void print_dir(int fd, t_list *dir_data, t_options options) {
+#if EXA
+	if (options & OPTION_L)
+		print_headers(fd);
+#endif
 	do {
 		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&dir_data);
 		print_entry(fd, current_dir, options);
 		clear_dir_data(current_dir);
 	} while (dir_data);
 }
-

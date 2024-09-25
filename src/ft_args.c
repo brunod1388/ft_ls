@@ -43,6 +43,9 @@ void add_option(t_ls_ctrl *ctrl, char *option_arg) {
 				ft_error(error_msg, 1);
 		}
 	}
+#if EXA
+	ctrl->options |= OPTION_G;
+#endif
 }
 
 t_ls_ctrl parse_args(int argc, char *argv[]) {

@@ -63,17 +63,12 @@ int process_path(int fd, char *path, t_ls_ctrl *ctrl) {
 int ft_ls_fd(int fd, int argc, char *argv[]) {
 	t_ls_ctrl	ctrl = parse_args(argc, argv);
 	t_list		*current = ctrl.paths;
-	int			show_header = ft_lstsize(ctrl.paths) > 1;
 
 #if DEBUG
 	print_args(ctrl);
 #endif
 
 	while (current) {
-		if (show_header) {
-			ft_printf_fd(fd, "%s:\n", (char *)current->content);
-		}
-
 		int ret = process_path(fd, (char *)current->content, &ctrl);
 
 		if ( ret != 0) {

@@ -120,7 +120,7 @@ void	ft_putnbr(int n);
 void	ft_putnbr_base(int n, char *base);
 
 int		ft_printf(const char *format, ...);
-char*	ft_fprintf(char *dest, const char *format, ...);
+int		ft_fprintf(char *dest, const char *format, ...);
 int		ft_printf_fd(int fd, const char *format, ...);
 char*	get_next_line(int fd);
 

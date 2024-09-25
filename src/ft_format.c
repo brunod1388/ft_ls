@@ -1,6 +1,8 @@
 #include "ft_ls.h"
 
 void format_size(char *dest, int size) {
+#if EXA
+
 	char	unit;
 	int		result;
 	int 	decimal;
@@ -28,6 +30,9 @@ void format_size(char *dest, int size) {
 		ft_fprintf(dest, "%d,%d%c", result, decimal, unit);
 	else
 		ft_fprintf(dest, "%3d%c", (int) result, unit);
+#else
+	ft_fprintf(dest, "%d", size);
+#endif
 }
 
 void format_time(char *dest, char *time_str) {
@@ -36,6 +41,7 @@ void format_time(char *dest, char *time_str) {
 		ft_error("malloc in format_time", 1);
 	}
 	split_time[3][5] = '\0';
+#if EXA
 	ft_fprintf(
 		dest,
 		"%s %s %s %s",
@@ -44,6 +50,15 @@ void format_time(char *dest, char *time_str) {
 		split_time[4],
 		split_time[3]
 	);
+#else
+	ft_fprintf(
+		dest,
+		"%s %s %s",
+		split_time[2],
+		split_time[1],
+		split_time[3]
+	);
+#endif
 	ft_clearsplit(split_time);
 }
 

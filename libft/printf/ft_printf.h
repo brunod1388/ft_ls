@@ -35,7 +35,7 @@ typedef struct s_fdata
 }			t_fdata;
 
 int		ft_printf(const char *format, ...);
-char*	ft_fprintf(char *dest, const char *format, ...);
+int		ft_fprintf(char *dest, const char *format, ...);
 int		ft_printf_fd(int fd, const char *format, ...);
 
 int		ft_printf_format(int fd, char *format, t_fdata *fdata);

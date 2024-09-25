@@ -8,7 +8,7 @@ struct s_dir_data *new_dir_data(struct dirent *entry, char *path) {
 	}
 	data->name = ft_strdup(entry->d_name);
 	if (!data->name) {
-		clear_dir_data(&data);
+		clear_dir_data(data);
 		ft_error("malloc in new_dir_data", 0);
 		return NULL;
 	}
@@ -27,7 +27,7 @@ struct s_dir_data *new_dir_data(struct dirent *entry, char *path) {
 	data->owner = ft_strdup(getpwuid(statbuf.st_uid)->pw_name);
 	data->group = ft_strdup(getgrgid(statbuf.st_gid)->gr_name);
 	if (!data->owner || !data->group) {
-		clear_dir_data(&data);
+		clear_dir_data(data);
 		ft_error("malloc in new_dir_data", 0);
 		return NULL;
 	}

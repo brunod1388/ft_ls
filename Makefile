@@ -7,6 +7,10 @@ ifeq ($(debug), 1)
 	CFLAGS	= -DDEBUG=1
 endif
 
+ifeq ($(exa), 1)
+	CFLAGS	= -DEXA=1
+endif
+
 NAME 		= ft_ls
 
 SRC_DIR = src
@@ -33,9 +37,13 @@ $(NAME):	$(OBJS)
 	@$(MAKE) -C ./libft
 	@gcc $(FLAGS) $(OBJS) $(INCLUDES) $(LIBFT) -o $(NAME)
 	@printf "$(NAME)		[$(_BLUE)✓$(_END)]\n"
-ifeq ($(debug), 1)
+ifeq ($(CFLAGS), 1)
 	@printf "debug mode	[$(_PURPLE)ON$(_END)]\n"
 endif
+ifeq ($(exa), 1)
+	@printf "exa mode	[$(_PURPLE)ON$(_END)]\n"
+endif
+
 
 all:	$(NAME)
 
@@ -51,7 +59,11 @@ fclean:	clean
 	@rm -rf $(NAME)
 	@printf "$(_PURPLE)$(NAME)		deleted$(_END)\n"
 
-dre: clean debug
+exa: clean
+	make exa=1
+
+debug: clean
+	make debug=1
 
 test:
 	./ft_ls testFolder libft -la
@@ -63,4 +75,12 @@ retest: re test
 leaks:
 	leaks -atExit -- ./ft_ls
 
-PHONY: re all clean fclean
+exatest: exa
+	./ft_ls testFolder libft -la
+	exa -la
+
+lstest: clean all
+	./ft_ls -la
+	/bin/ls -la
+
+PHONY: re all clean fclean test retest leaks debug exa

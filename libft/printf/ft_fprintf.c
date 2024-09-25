@@ -39,18 +39,19 @@ int	ft_fprintf_format(char *dest, char *format, t_fdata *fdata)
 	return (count);
 }
 
-char* ft_fprintf(char *dest, const char *format, ...)
+int ft_fprintf(char *dest, const char *format, ...)
 {
 	t_fdata	*fdata;
+	int		len;
 
 	if (!format)
 		return (0);
 	fdata = malloc(sizeof(t_fdata));
 	if (!fdata)
-		return (NULL);
+		return (-1);
 	va_start(fdata->ap, format);
-	ft_fprintf_format(dest, (char *) format, fdata);
+	len = ft_fprintf_format(dest, (char *) format, fdata);
 	va_end(fdata->ap);
 	free(fdata);
-	return (dest);
+	return (len);
 }

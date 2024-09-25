@@ -5,12 +5,18 @@
 # define DEBUG 0
 #endif
 
+#ifndef EXA
+# define EXA 0
+#endif
+
 #ifdef __APPLE__
     #define MAX_PATH_LENGTH __DARWIN_MAXPATHLEN
 #else
     #define MAX_PATH_LENGTH 1024
 #endif
 
+
+#include <stdbool.h>
 #include "libft.h"
 #include <dirent.h> // opendir readdir closedir
 #include <sys/stat.h> // stat lstat
@@ -44,6 +50,7 @@ typedef int32_t t_options;
 typedef struct s_ls_ctrl {
 	t_options		options;
 	t_list 			*paths;
+	t_list			*dir_list;
 } t_ls_ctrl;
 
 typedef struct s_dir_data {
@@ -56,6 +63,7 @@ typedef struct s_dir_data {
 	int 			nlink;
 	int 			block_size;
 	unsigned char	d_type;
+	char			*path;
 } t_dir_data;
 
 
@@ -69,6 +77,7 @@ void		clear_dir_data(t_dir_data *data);
 
 // ft_print.c
 void print_dir(int fd, t_list *dir_data, t_options options);
+void print_headers(int fd);
 
 // ft_format.c
 void format_size(char *dest, int size);
