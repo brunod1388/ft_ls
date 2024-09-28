@@ -3,14 +3,6 @@ FLAGS		= -Wall -Wextra -Werror -o3 -g3
 INCLUDES	= -I libft/includes/ -I includes/
 LIBFT		= -L./libft -lft
 
-ifeq ($(debug), 1)
-	CFLAGS	= -DDEBUG=1
-endif
-
-ifeq ($(exa), 1)
-	CFLAGS	= -DEXA=1
-endif
-
 NAME 		= ft_ls
 
 SRC_DIR = src
@@ -25,6 +17,15 @@ _BLUE	=	\e[34m
 _PURPLE	=	\e[35m
 _CYAN	=	\e[36m
 _END	=	\e[0m
+
+ifeq ($(debug), 1)
+	CFLAGS	= -DDEBUG=1
+	SRCS	+= ft_debug.c
+endif
+
+ifeq ($(exa), 1)
+	CFLAGS	= -DEXA=1
+endif
 
 #%.o: %.c
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
@@ -65,22 +66,14 @@ exa: clean
 debug: clean
 	make debug=1
 
-test:
-	./ft_ls testFolder libft -la
-	ls -la testFolder libft
-	exa -la testFolder libft
+test: $(NAME)
+	@cp $(NAME) test/
+	@chmod +x test/ls_test.sh
+	@sh test/ls_test.sh
 
 retest: re test
 
 leaks:
 	leaks -atExit -- ./ft_ls
-
-exatest: exa
-	./ft_ls testFolder libft -la
-	exa -la
-
-lstest: clean all
-	./ft_ls -la
-	/bin/ls -la
 
 PHONY: re all clean fclean test retest leaks debug exa

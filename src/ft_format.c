@@ -54,8 +54,8 @@ void format_time(char *dest, char *time_str) {
 	ft_fprintf(
 		dest,
 		"%s %s %s",
-		split_time[2],
 		split_time[1],
+		split_time[2],
 		split_time[3]
 	);
 #endif
@@ -91,11 +91,12 @@ void format_perms(char *dest, char *perms) {
 }
 
 void format_name(char *dest, t_dir_data *dir_data, t_options options) {
-	if (!(options & OPTION_G))
+	mode_t st_mode = dir_data->st_mode;
+	if (!IS_COLOR(options))
 		ft_strcpy(dest, dir_data->name);
-	else if (dir_data->d_type == DT_DIR)
+	else if (S_ISDIR(st_mode))
 		ft_fprintf(dest, "%s%s%s", COLOR_BLUE, dir_data->name, COLOR_RESET);
-	else if (dir_data->d_type == DT_LNK)
+	else if (S_ISLNK(st_mode))
 		ft_fprintf(dest, "%s%s%s", COLOR_YELLOW, dir_data->name, COLOR_RESET);
 	else
 		ft_strcpy(dest, dir_data->name);

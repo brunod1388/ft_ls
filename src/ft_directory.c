@@ -1,5 +1,29 @@
 #include "ft_ls.h"
 
+#if DEBUG
+#include "ft_debug.h"
+#endif
+
+void parse_stat(char *path, t_dir_data *data) {
+	struct stat statbuf;
+	if (lstat(path, &statbuf) == -1) {
+		ft_error("lstat in parse_stat", 0);
+	}
+	data->size = statbuf.st_size;
+	data->time = statbuf.st_mtime;
+	data->nlink = statbuf.st_nlink;
+	data->block_size = statbuf.st_blocks;
+	data->st_mode = statbuf.st_mode;
+	data->owner = ft_strdup(getpwuid(statbuf.st_uid)->pw_name);
+	data->group = ft_strdup(getgrgid(statbuf.st_gid)->gr_name);
+	set_permissions(data->perms, data->st_mode);
+	if (listxattr(path, NULL, 0, XATTR_NOFOLLOW))
+		data->has_extattr = true;
+	if (!data->owner || !data->group) {
+		ft_error("malloc in parse_stat", 0);
+	}
+}
+
 t_dir_data *new_dir_data(struct dirent *entry, char *path) {
 	struct s_dir_data *data = ft_calloc(1, sizeof(struct s_dir_data));
 	if (!data) {
@@ -14,18 +38,10 @@ t_dir_data *new_dir_data(struct dirent *entry, char *path) {
 	}
 	char full_path[MAX_PATH_LENGTH] = {0};
 	ft_fprintf(full_path, "%s/%s", path, entry->d_name);
-	struct stat statbuf;
-	if (lstat(full_path, &statbuf) == -1) {
-		ft_error("lstat in new_dir_data", 0);
-	}
-	set_permissions(data->perms, statbuf);
-	data->size = statbuf.st_size;
-	data->time = statbuf.st_mtime;
-	data->nlink = statbuf.st_nlink;
-	data->block_size = statbuf.st_blocks;
-	data->d_type = entry->d_type;
-	data->owner = ft_strdup(getpwuid(statbuf.st_uid)->pw_name);
-	data->group = ft_strdup(getgrgid(statbuf.st_gid)->gr_name);
+	parse_stat(full_path, data);
+
+	if (listxattr(full_path, NULL, 0, XATTR_NOFOLLOW))
+		data->has_extattr = true;
 	if (!data->owner || !data->group) {
 		clear_dir_data(data);
 		ft_error("malloc in new_dir_data", 0);

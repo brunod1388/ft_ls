@@ -19,7 +19,7 @@ void add_option(t_ls_ctrl *ctrl, char *option_arg) {
 
 		switch (option) {
 			case 'l':
-				ctrl->options |= OPTION_L;
+				ctrl->options |= OPTION_l;
 				break;
 			case 'R':
 				ctrl->options |= OPTION_R;
@@ -67,25 +67,4 @@ t_ls_ctrl parse_args(int argc, char *argv[]) {
 void clear_args(t_ls_ctrl *ctrl) {
 	if (ctrl->paths_args)
 		ft_lstclear(&ctrl->paths_args, NULL);
-}
-
-void print_args(const t_ls_ctrl ctrl) {
-
-	char optionStr[32] = {0};
-	ft_printf("---Arguments---\n");
-	ft_printf("Options: %b", ctrl.options);
-	for (int i = 0, j = 0; i < 6; i++) {
-		if (ctrl.options & (1 << i)) 
-			optionStr[j++] =  "lRart"[i];
-	}
-	if (!ctrl.options)
-		ft_strcpy(optionStr, "None");
-	ft_printf("%s\n", optionStr);
-	ft_printf("Paths:\n");
-	t_list *current = ctrl.paths_args;
-	while (current) {
-		ft_printf("\t%s\n", (char *)current->content);
-		current = current->next;
-	}
-	ft_printf("---------------\n");
 }
