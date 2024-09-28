@@ -9,7 +9,7 @@ void add_path(t_ls_ctrl *ctrl, const char *path) {
 		clear_args(ctrl);
 		ft_error("malloc in path", 1);
 	}
-	ft_lstadd_back(&ctrl->paths, current_path);
+	ft_lstadd_back(&ctrl->paths_args, current_path);
 }
 
 void add_option(t_ls_ctrl *ctrl, char *option_arg) {
@@ -49,7 +49,7 @@ void add_option(t_ls_ctrl *ctrl, char *option_arg) {
 }
 
 t_ls_ctrl parse_args(int argc, char *argv[]) {
-	t_ls_ctrl ctrl = {.options = 0, .paths = NULL};
+	t_ls_ctrl ctrl = {0};
 
 	for (int i = 1; i < argc; i++) {
 		if (argv[i][0] == '-')
@@ -57,7 +57,7 @@ t_ls_ctrl parse_args(int argc, char *argv[]) {
 		else
 			add_path(&ctrl, argv[i]);
 	}
-	if (!ctrl.paths)
+	if (!ctrl.paths_args)
 		add_path(&ctrl, G_DEFAULT_PATH);
 
 	return ctrl;
@@ -65,8 +65,8 @@ t_ls_ctrl parse_args(int argc, char *argv[]) {
 
 
 void clear_args(t_ls_ctrl *ctrl) {
-	if (ctrl->paths)
-		ft_lstclear(&ctrl->paths, NULL);
+	if (ctrl->paths_args)
+		ft_lstclear(&ctrl->paths_args, NULL);
 }
 
 void print_args(const t_ls_ctrl ctrl) {
@@ -82,7 +82,7 @@ void print_args(const t_ls_ctrl ctrl) {
 		ft_strcpy(optionStr, "None");
 	ft_printf("%s\n", optionStr);
 	ft_printf("Paths:\n");
-	t_list *current = ctrl.paths;
+	t_list *current = ctrl.paths_args;
 	while (current) {
 		ft_printf("\t%s\n", (char *)current->content);
 		current = current->next;

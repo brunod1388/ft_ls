@@ -20,15 +20,15 @@ void print_list(char dest[MAX_LINE_LEN], t_dir_data *dir_data, t_options options
 	int offset = 0;
 
 #if EXA
-	offset += ft_fprintf(dest + offset, "%s", colored ? formatted_permissions : dir_data->perms);
+	offset += ft_fprintf(dest + offset, "%s", formatted_permissions);
 	if (EXA == 1 && dir_data->d_type != DT_DIR)
-		offset += ft_fprintf(dest + offset, "%s%6s", colored ? COLOR_BLUE : "", formatted_size);
+		offset += ft_fprintf(dest + offset, "%s%6s", COLOR_GREEN, formatted_size);
 	else
 		offset += ft_fprintf(dest + offset, "%s     -", COLOR_GREY);
-	offset += ft_fprintf(dest + offset, " %s%s", colored ? COLOR_YELLOW : "", dir_data->owner);
+	offset += ft_fprintf(dest + offset, " %s%s", COLOR_YELLOW, dir_data->owner);
 	offset += ft_fprintf(dest + offset, " %s", dir_data->group);
-	offset += ft_fprintf(dest + offset, " %s%s", colored ? COLOR_BLUE : "", formatted_time);
-	offset += ft_fprintf(dest + offset, " %s%s\n", colored ? COLOR_RESET : "", formatted_name);
+	offset += ft_fprintf(dest + offset, " %s%s", COLOR_BLUE, formatted_time);
+	offset += ft_fprintf(dest + offset, " %s%s\n", COLOR_RESET, formatted_name);
 #else
 	offset += ft_fprintf(dest + offset, "%s", colored ? formatted_permissions : dir_data->perms);
 	offset += ft_fprintf(dest + offset, "%s%4d ", colored ? COLOR_BLUE : "", dir_data->nlink);
@@ -72,14 +72,40 @@ void print_headers(int fd) {
 	ft_printf_fd(fd, "     %c[4mName\n%c[0m",27,27);
 }
 
-void print_dir(int fd, t_list *dir_data, t_options options) {
+void print_total(int fd, t_list *dir_data_list) {
+	int total = 0;
+
+	while (dir_data_list) {
+		total += ((t_dir_data*) dir_data_list->content)->block_size;
+		dir_data_list = dir_data_list->next;
+	}
+	ft_printf_fd(fd, "total %d\n", total);
+}
+
+void print_dir(int fd, char* path, t_list *dir_data_list, t_ls_ctrl *ctrl, t_list **path_queue) {
+	t_options options = ctrl->options;
+
+	if (ctrl->options & OPTION_R)
+		ft_printf_fd(fd, "%s:\n", path);
+
 #if EXA
 	if (options & OPTION_L)
 		print_headers(fd);
 #endif
+
+	if (options & OPTION_L)
+		print_total(fd, dir_data_list);
 	do {
-		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&dir_data);
+		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&dir_data_list);
 		print_entry(fd, current_dir, options);
+		if (options & OPTION_R && current_dir->d_type == DT_DIR && ft_strcmp(current_dir->name, ".") && ft_strcmp(current_dir->name, "..")) {
+			char fullpath[MAX_PATH_LENGTH] = {0};
+			ft_fprintf(fullpath, "%s/%s", path, current_dir->name);
+			ft_lstadd_back(path_queue, ft_lstnew(ft_strdup(fullpath)));
+		}
 		clear_dir_data(current_dir);
-	} while (dir_data);
+	} while (dir_data_list);
+	ft_putchar_fd('\n', fd);
+	if (!(ctrl->options & OPTION_L))
+		ft_putchar_fd('\n', fd);
 }

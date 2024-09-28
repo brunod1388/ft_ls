@@ -37,7 +37,7 @@ $(NAME):	$(OBJS)
 	@$(MAKE) -C ./libft
 	@gcc $(FLAGS) $(OBJS) $(INCLUDES) $(LIBFT) -o $(NAME)
 	@printf "$(NAME)		[$(_BLUE)✓$(_END)]\n"
-ifeq ($(CFLAGS), 1)
+ifeq ($(debug), 1)
 	@printf "debug mode	[$(_PURPLE)ON$(_END)]\n"
 endif
 ifeq ($(exa), 1)

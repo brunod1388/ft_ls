@@ -49,8 +49,7 @@ typedef int32_t t_options;
 
 typedef struct s_ls_ctrl {
 	t_options		options;
-	t_list 			*paths;
-	t_list			*dir_list;
+	t_list 			*paths_args;
 } t_ls_ctrl;
 
 typedef struct s_dir_data {
@@ -76,7 +75,7 @@ t_dir_data	*new_dir_data(struct dirent *entry, char *path);
 void		clear_dir_data(t_dir_data *data);
 
 // ft_print.c
-void print_dir(int fd, t_list *dir_data, t_options options);
+void print_dir(int fd, char* path, t_list *dir_data, t_ls_ctrl *ctrl, t_list **path_queue);
 void print_headers(int fd);
 
 // ft_format.c

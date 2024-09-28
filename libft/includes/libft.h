@@ -137,6 +137,7 @@ t_list* ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 void*	ft_getnblist(t_list *lst, int nb);
 void	ft_lstsort(t_list **lst, int (*cmp)(void *, void *));
 void*	ft_lstpop_front(t_list **lst);
+void*	ft_lstfind(t_list **lst, void *content, int (*cmp)(void *, void *));
 
 t_dlist*	ft_dlnew(void);
 void		ft_dlinit(t_dlist *dl);

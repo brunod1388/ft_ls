@@ -1,6 +1,6 @@
 #include "ft_ls.h"
 
-struct s_dir_data *new_dir_data(struct dirent *entry, char *path) {
+t_dir_data *new_dir_data(struct dirent *entry, char *path) {
 	struct s_dir_data *data = ft_calloc(1, sizeof(struct s_dir_data));
 	if (!data) {
 		ft_error("malloc in new_dir_data", 0);
