@@ -2,17 +2,17 @@
 #define FT_LS_H
 
 #ifndef DEBUG
-# define DEBUG 0
+#define DEBUG 0
 #endif
 
 #ifndef EXA
-# define EXA 0
+#define EXA 0
 #endif
 
 #ifdef __APPLE__
-    #define MAX_PATH_LENGTH __DARWIN_MAXPATHLEN
+#define MAX_PATH_LENGTH __DARWIN_MAXPATHLEN
 #else
-    #define MAX_PATH_LENGTH 1024
+#define MAX_PATH_LENGTH 1024
 #endif
 
 
@@ -45,18 +45,19 @@
 #define IS_COLOR(option) (option & OPTION_G)
 #define IS_LINK(option) (option & OPTION_L)
 
-#define COLOR_RED		"\033[0;31m"
-#define COLOR_GREY		"\033[0;37m"
-#define COLOR_GREEN		"\033[0;32m"
-#define COLOR_BLUE		"\033[0;34m"
-#define COLOR_YELLOW	"\033[0;33m"
-#define COLOR_RESET		"\033[0m"
+#define COLOR_RED			"\033[0;31m"
+#define COLOR_GREY			"\033[0;37m"
+#define COLOR_GREEN			"\033[0;32m"
+#define COLOR_BLUE			"\033[0;34m"
+#define COLOR_YELLOW		"\033[0;33m"
+#define COLOR_LIGHT_BLUE	"\033[1;36m"
+#define COLOR_RESET			"\033[0m"
 
 #define ERROR_MSG_LEN 256
 #define MAX_LINE_LEN 1024
 
 typedef int32_t t_options;
-
+typedef t_list t_dir_data_list;
 typedef struct s_ls_ctrl {
 	t_options		options;
 	t_list 			*paths_args;
@@ -82,12 +83,13 @@ int	ft_ls(int argc, char *argv[]);
 int	ft_ls_fd(int fd, int argc, char *argv[]);
 
 // ft_directory.c
-t_dir_data	*new_dir_data(struct dirent *entry, char *path);
+t_dir_data	*new_dir_data(char *d_name, char *path);
 void		clear_dir_data(t_dir_data *data);
 
 // ft_print.c
-void print_dir(int fd, char* path, t_list *dir_data, t_ls_ctrl *ctrl);
+void print_dir(int fd, char* path, t_dir_data_list *entries, t_ls_ctrl *ctrl);
 void print_headers(int fd);
+void print_long(char dest[MAX_LINE_LEN], t_dir_data *dir_data, t_options options);
 
 // ft_format.c
 void format_size(char *dest, int size);
@@ -112,5 +114,6 @@ int	comp_path(const char *queue_path_to_compare, const char *path_to_find);
 void		set_permissions(char *perms, mode_t mode);
 const char* get_dirent_type_string(unsigned char d_type);
 void		ft_error(const char *msg, const int exiting);
+void		set_full_path(char *full_path, char *path, char *d_name);
 
 #endif

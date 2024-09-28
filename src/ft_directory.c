@@ -1,9 +1,5 @@
 #include "ft_ls.h"
 
-#if DEBUG
-#include "ft_debug.h"
-#endif
-
 void parse_stat(char *path, t_dir_data *data) {
 	struct stat statbuf;
 	if (lstat(path, &statbuf) == -1) {
@@ -24,20 +20,24 @@ void parse_stat(char *path, t_dir_data *data) {
 	}
 }
 
-t_dir_data *new_dir_data(struct dirent *entry, char *path) {
-	struct s_dir_data *data = ft_calloc(1, sizeof(struct s_dir_data));
+t_dir_data *new_dir_data(char* d_name, char *path) {
+	t_dir_data *data = ft_calloc(1, sizeof(t_dir_data));
 	if (!data) {
 		ft_error("malloc in new_dir_data", 0);
 		return NULL;
 	}
-	data->name = ft_strdup(entry->d_name);
+	data->name = ft_strdup(d_name);
 	if (!data->name) {
 		clear_dir_data(data);
 		ft_error("malloc in new_dir_data", 0);
 		return NULL;
 	}
+
 	char full_path[MAX_PATH_LENGTH] = {0};
-	ft_fprintf(full_path, "%s/%s", path, entry->d_name);
+	if (path)
+		ft_fprintf(full_path, "%s/", path);
+	ft_strcat(full_path, d_name);
+
 	parse_stat(full_path, data);
 
 	if (listxattr(full_path, NULL, 0, XATTR_NOFOLLOW))

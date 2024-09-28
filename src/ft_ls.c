@@ -1,4 +1,5 @@
 #include "ft_ls.h"
+
 #if DEBUG
 #include "ft_debug.h"
 #endif
@@ -27,14 +28,14 @@ void apply_sort_options(t_list *dir_data_list, t_options options) {
 	}
 }
 
-t_list *process_dir(DIR *dir, char *path, t_options options, t_list **path_queue) {
+t_dir_data_list *process_dir(DIR *dir, char *path, t_options options, t_list **path_queue) {
 	struct dirent *entry;
 	t_list *dir_data_list = NULL;
 
 	while ((entry = readdir(dir))) {
 		if (entry->d_name[0] == '.' && !IS_ALL(options))
 			continue;
-		struct s_dir_data *data = new_dir_data(entry, path);
+		t_dir_data *data = new_dir_data(entry->d_name, path);
 		if (!data) {
 			ft_lstclear(&dir_data_list,(void (*)(void *)) clear_dir_data);
 			ft_error("malloc in process_dir", 0);
@@ -53,21 +54,36 @@ t_list *process_dir(DIR *dir, char *path, t_options options, t_list **path_queue
 	return dir_data_list;
 }
 
+int handle_symlink(int fd, char *path, t_options options) {
+	t_dir_data *data = new_dir_data(path, NULL);
+	char buffer[MAX_LINE_LEN] = {0};
+	char link_path[MAX_PATH_LENGTH] = {0};
 
+	if (!data) {
+		ft_error("malloc in handle_symlink", 0);
+		return 1;
+	}
+	print_long(buffer, data, options);
+	buffer[ft_strlen(buffer) - 1] = '\0';
+	readlink(path, link_path, MAX_PATH_LENGTH);
+	// ft_printf("%s -> %s\n", buffer, link_path);
+	ft_printf_fd(fd, "%s -> %s\n", buffer, link_path);
+
+	clear_dir_data(data);
+	return 0;
+}
 
 int process_path(int fd, char *path, t_ls_ctrl *ctrl, t_list *path_queue) {
 	DIR *dir;
-	t_list *entry_list;
+	t_dir_data_list *entry_list;
 
 	if (path == NULL) {
 		ft_error("NULL path", 0);
 		return 1;
 	}
 
-	if (is_symlink(path)) {
-		printf("%s is a symbolic link.\n", path);
-		// Handle symbolic link case here if needed
-    }
+	if (is_symlink(path) && IS_LONG(ctrl->options) && !IS_LINK(ctrl->options))
+		return handle_symlink(fd, path, ctrl->options);
 
 	dir = opendir(path);
 	if (!dir) {

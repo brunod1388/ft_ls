@@ -36,3 +36,10 @@ void ft_error(const char *msg, const int exiting) {\
 	ft_putchar_fd('\n', STDERR_FILENO);
 	if (exiting) exit(1);
 }
+
+void set_full_path(char *full_path, char *path, char *d_name) {
+	if (path)
+		ft_fprintf(full_path, "%s/%s", path, d_name);
+	else
+		ft_strcpy(full_path, d_name);
+}

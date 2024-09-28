@@ -73,17 +73,17 @@ void print_headers(int fd) {
 	ft_printf_fd(fd, "     %c[4mName\n%c[0m",27,27);
 }
 
-void print_total(int fd, t_list *entry_list) {
+void print_total(int fd, t_dir_data_list *entries) {
 	int total = 0;
 
-	while (entry_list) {
-		total += ((t_dir_data*) entry_list->content)->block_size;
-		entry_list = entry_list->next;
+	while (entries) {
+		total += ((t_dir_data*) entries->content)->block_size;
+		entries = entries->next;
 	}
 	ft_printf_fd(fd, "total %d\n", total);
 }
 
-void print_dir(int fd, char* path, t_list *entry_list, t_ls_ctrl *ctrl) {
+void print_dir(int fd, char* path, t_dir_data_list *entries, t_ls_ctrl *ctrl) {
 	t_options options = ctrl->options;
 
 	if (ctrl->options & OPTION_R & ft_strcmp(path, "."))
@@ -95,13 +95,13 @@ void print_dir(int fd, char* path, t_list *entry_list, t_ls_ctrl *ctrl) {
 #endif
 
 	if (options & OPTION_l)
-		print_total(fd, entry_list);
+		print_total(fd, entries);
 
 	do {
-		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&entry_list);
+		t_dir_data *current_dir = (t_dir_data*) ft_lstpop_front(&entries);
 		print_entry(fd, current_dir, options);
 		clear_dir_data(current_dir);
-	} while (entry_list);
+	} while (entries);
 
 	ft_putchar_fd('\n', fd);
 	if (!(ctrl->options & OPTION_l))

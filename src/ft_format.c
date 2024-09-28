@@ -66,6 +66,8 @@ void format_perms(char *dest, char *perms) {
 
 	if (*perms == 'd')
 		ft_strcat(dest, COLOR_BLUE);
+	else if (*perms == 'l')
+		ft_strcat(dest, COLOR_LIGHT_BLUE);
 	ft_strncat(dest, perms, 1);
 
 	while (*++perms) {

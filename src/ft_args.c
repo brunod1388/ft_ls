@@ -36,6 +36,9 @@ void add_option(t_ls_ctrl *ctrl, char *option_arg) {
 			case 'G':
 				ctrl->options |= OPTION_G;
 				break;
+			case 'L':
+				ctrl->options |= OPTION_L;
+				break;
 			default:
 				clear_args(ctrl);
 				ft_fprintf(error_msg, "illegal option -- %c", option);
